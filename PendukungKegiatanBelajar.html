@@ -68,6 +68,7 @@
                     <input type="number" id="breakTime" class="form-control" placeholder="5">
                 </div>
                 <button class="btn btn-primary" id="startTimer">Mulai</button>
+                <button class="btn btn-danger" id="stopTimer">Hentikan</button>
                 <h4 class="mt-4 text-center" id="timerDisplay">00:00</h4>
                 <p class="mt-2 text-center" id="endTimeDisplay"></p>
             </div>
@@ -98,7 +99,6 @@
                             allowfullscreen="" 
                             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                             loading="lazy"></iframe>
-
                 </div>
             </div>
         </div>
@@ -107,46 +107,43 @@
     <script>
         // Pomodoro Timer Logic
         let timer;
+        let paused = false;
+        let remainingSeconds = 0;
         const timerDisplay = document.getElementById('timerDisplay');
         const endTimeDisplay = document.getElementById('endTimeDisplay');
+        
         document.getElementById('startTimer').addEventListener('click', () => {
             const studyTime = parseInt(document.getElementById('studyTime').value) || 25;
             const breakTime = parseInt(document.getElementById('breakTime').value) || 5;
 
-            let seconds = studyTime * 60;
+            if (!paused) {
+                remainingSeconds = studyTime * 60;
+            }
+
+            paused = false;
             clearInterval(timer);
 
-            const endTime = new Date(Date.now() + seconds * 1000);
+            const endTime = new Date(Date.now() + remainingSeconds * 1000);
             endTimeDisplay.textContent = `Waktu selesai belajar: ${endTime.toLocaleTimeString()}`;
 
             timer = setInterval(() => {
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = seconds % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-                if (seconds > 0) {
-                    seconds--;
+                if (remainingSeconds > 0) {
+                    remainingSeconds--;
                 } else {
                     clearInterval(timer);
                     alert('Waktu belajar selesai! Istirahatlah sejenak.');
-                    seconds = breakTime * 60;
-                    const breakEndTime = new Date(Date.now() + seconds * 1000);
-                    endTimeDisplay.textContent = `Waktu selesai istirahat: ${breakEndTime.toLocaleTimeString()}`;
-
-                    timer = setInterval(() => {
-                        const minutes = Math.floor(seconds / 60);
-                        const remainingSeconds = seconds % 60;
-                        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-
-                        if (seconds > 0) {
-                            seconds--;
-                        } else {
-                            clearInterval(timer);
-                            alert('Waktu istirahat selesai! Kembali belajar.');
-                        }
-                    }, 1000);
+                    remainingSeconds = breakTime * 60;
                 }
             }, 1000);
+        });
+
+        document.getElementById('stopTimer').addEventListener('click', () => {
+            paused = true;
+            clearInterval(timer);
         });
 
         // To-Do List Logic
@@ -202,7 +199,6 @@
             }
         });
 
-        // Load todos on page load
         loadTodos();
     </script>
 </body>
