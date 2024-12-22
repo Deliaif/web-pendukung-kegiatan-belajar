@@ -39,6 +39,8 @@ Website ini dirancang untuk membantu meningkatkan produktivitas selama belajar d
    - Masukkan durasi waktu belajar dan waktu istirahat pada form input.
    - Klik tombol **Mulai** untuk memulai hitungan mundur.
    - Timer akan menampilkan waktu tersisa dan memberikan alert ketika sesi belajar atau istirahat selesai.
+   - Klik tombol **Hentikan** untuk menghentikan sementara waktu. Timer dapat dilanjutkan tanpa mengulang dari awal.
+
 
 ### 2. **To-Do List**
    - Masukkan nama tugas pada kolom input dan klik tombol **Tambah**.
