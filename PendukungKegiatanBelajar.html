@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Efektif</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #53475a;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        h1 {
+            color: #ffffff;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 300px;
+        }
+        .card-title {
+            color: #4b59d7;
+            font-size: 1.5rem;
+        }
+        #timerDisplay {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        #endTimeDisplay {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .list-group-item {
+            border-radius: 5px;
+        }
+        .btn {
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Website Pendukung Kegiatan Belajar😎</h1>
+
+        <!-- Pomodoro Timer -->
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Pomodoro Timer</h3>
+                <div class="mb-3">
+                    <label for="studyTime" class="form-label">Waktu Belajar (menit):</label>
+                    <input type="number" id="studyTime" class="form-control" placeholder="25">
+                </div>
+                <div class="mb-3">
+                    <label for="breakTime" class="form-label">Waktu Istirahat (menit):</label>
+                    <input type="number" id="breakTime" class="form-control" placeholder="5">
+                </div>
+                <button class="btn btn-primary" id="startTimer">Mulai</button>
+                <h4 class="mt-4 text-center" id="timerDisplay">00:00</h4>
+                <p class="mt-2 text-center" id="endTimeDisplay"></p>
+            </div>
+        </div>
+
+        <!-- To-Do List -->
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">To-Do List</h3>
+                <div class="input-group mb-3">
+                    <input type="text" id="todoInput" class="form-control" placeholder="Tambahkan tugas baru">
+                    <button class="btn btn-success" id="addTodo">Tambah</button>
+                </div>
+                <ul class="list-group" id="todoList"></ul>
+            </div>
+        </div>
+
+        <!-- Spotify Playlist -->
+        <div class="card" style="flex: 100%;">
+            <div class="card-body">
+                <h3 class="card-title">Spotify Playlist</h3>
+                <p class="text-center">Nikmati musik sambil belajar dengan playlist berikut:</p>
+                <div class="ratio ratio-16x9">
+                    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0lgbRhtrzOdCrRYVVACWp5?utm_source=generator" 
+                            width="100%" 
+                            height="152" 
+                            frameBorder="0" 
+                            allowfullscreen="" 
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                            loading="lazy"></iframe>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pomodoro Timer Logic
+        let timer;
+        const timerDisplay = document.getElementById('timerDisplay');
+        const endTimeDisplay = document.getElementById('endTimeDisplay');
+        document.getElementById('startTimer').addEventListener('click', () => {
+            const studyTime = parseInt(document.getElementById('studyTime').value) || 25;
+            const breakTime = parseInt(document.getElementById('breakTime').value) || 5;
+
+            let seconds = studyTime * 60;
+            clearInterval(timer);
+
+            const endTime = new Date(Date.now() + seconds * 1000);
+            endTimeDisplay.textContent = `Waktu selesai belajar: ${endTime.toLocaleTimeString()}`;
+
+            timer = setInterval(() => {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+                if (seconds > 0) {
+                    seconds--;
+                } else {
+                    clearInterval(timer);
+                    alert('Waktu belajar selesai! Istirahatlah sejenak.');
+                    seconds = breakTime * 60;
+                    const breakEndTime = new Date(Date.now() + seconds * 1000);
+                    endTimeDisplay.textContent = `Waktu selesai istirahat: ${breakEndTime.toLocaleTimeString()}`;
+
+                    timer = setInterval(() => {
+                        const minutes = Math.floor(seconds / 60);
+                        const remainingSeconds = seconds % 60;
+                        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+                        if (seconds > 0) {
+                            seconds--;
+                        } else {
+                            clearInterval(timer);
+                            alert('Waktu istirahat selesai! Kembali belajar.');
+                        }
+                    }, 1000);
+                }
+            }, 1000);
+        });
+
+        // To-Do List Logic
+        const todoInput = document.getElementById('todoInput');
+        const todoList = document.getElementById('todoList');
+
+        const loadTodos = () => {
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            todos.forEach(todo => addTodoToDOM(todo.text, todo.completed));
+        };
+
+        const addTodoToDOM = (text, completed = false) => {
+            const li = document.createElement('li');
+            li.className = `list-group-item d-flex justify-content-between align-items-center ${completed ? 'list-group-item-success' : ''}`;
+            li.innerHTML = `
+                <span>${text}</span>
+                <div>
+                    <button class="btn btn-sm btn-success me-2 markComplete">Selesai</button>
+                    <button class="btn btn-sm btn-danger deleteTodo">Hapus</button>
+                </div>
+            `;
+
+            li.querySelector('.markComplete').addEventListener('click', () => {
+                li.classList.toggle('list-group-item-success');
+                updateLocalStorage();
+            });
+
+            li.querySelector('.deleteTodo').addEventListener('click', () => {
+                li.remove();
+                updateLocalStorage();
+            });
+
+            todoList.appendChild(li);
+        };
+
+        const updateLocalStorage = () => {
+            const todos = [];
+            todoList.querySelectorAll('li').forEach(li => {
+                todos.push({
+                    text: li.querySelector('span').textContent,
+                    completed: li.classList.contains('list-group-item-success')
+                });
+            });
+            localStorage.setItem('todos', JSON.stringify(todos));
+        };
+
+        document.getElementById('addTodo').addEventListener('click', () => {
+            const text = todoInput.value.trim();
+            if (text) {
+                addTodoToDOM(text);
+                updateLocalStorage();
+                todoInput.value = '';
+            }
+        });
+
+        // Load todos on page load
+        loadTodos();
+    </script>
+</body>
+</html>
